@@ -12,14 +12,14 @@ from Bio.PDB.Polypeptide import to_one_letter_code
 from Bio import PDB
 
 def get_sequence(structure, format, chain=None):
-    """ Return a sequence from a structure with the given format.
-
+    """ 
+    Return a sequence from a structure with the given format.
     Arguments:
-    o structure - Structure object, the protein structurewhere the sequence
-                  will be extracted.
-    o format - string, the format which the sequence will be returned.
-    o chain - string, optional, the chain that will be extracted, if None
-              will extract the sequences from all the chains.
+        o structure - Structure object, the protein structurewhere the sequence
+                      will be extracted.
+        o format - string, the format which the sequence will be returned.
+        o chain - string, optional, the chain that will be extracted, if None
+                  will extract the sequences from all the chains.
     """
 
     records = []
@@ -36,9 +36,33 @@ def get_sequence(structure, format, chain=None):
                 records.append( record )
 
     seqs = ""
-    for r in records:
-        seqs += r.format(format)
-        seqs += "\n"
+    if format != "pir":
+        for r in records:
+            seqs += r.format(format)
+            seqs += "\n\n"
+    else:
+        for r in records:
+            seqs += ">F1;"+r.id.upper()+"\n"
+            seqs += r.description+"\n"
+            s = r.seq+"*"
+            x = len(s) % 10
+            blocks = len(s) / 10
+            a = 0
+            b = 10
+            w = 0
+            for y in range(blocks):
+                if w == 0: seqs += "  "
+                seqs += s[a:b]
+                w += 1
+                if w == 5: 
+                    seqs += "\n"
+                    w = 0
+                else: seqs += " "
+                a += 10
+                b += 10
+
+            if w == 0: seqs += "  "
+            seqs += s[a:a+x] +"\n\n"
 
     return seqs
 
@@ -55,11 +79,6 @@ if __name__ == "__main__":
     # argv[1] -> PDB file
     # argv[2] -> Format
     # argv[3] -> Chain
-
-    # Example:
-    #   % python get_sequence.py 13GS.pdb fasta
-    # Or:
-    #   % python get_sequence.py 13GS.pdb fasta B
 
     parser = PDB.PDBParser()
 
