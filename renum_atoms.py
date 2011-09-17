@@ -20,7 +20,7 @@ def renum_atoms(structure, output, model_id=0, start=1):
 
     w = PDB.PDBIO()
     w.set_structure(structure)
-    w.save(output)
+    w.save(output, conserve_atoms_number=True)
 
 
 if __name__ == "__main__":
